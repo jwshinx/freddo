@@ -44,7 +44,7 @@ get '/drive_sessions/first' do
     error 404, { error: 'drive session nonexistent' }.to_json
   end
   #JSON.pretty_generate(
-  haml :first, :layout => :drive_session, :locals => { :ds => ds }
+  #haml :first, :layout => :drive_session, :locals => { :ds => ds }
 end
 
 get '/drive_sessions/new' do
@@ -54,9 +54,11 @@ get '/drive_sessions/new' do
 end
 
 post '/drive_sessions' do
-  ds = DriveSession.find_by_name('HT001_joelshin')
+  #ds = DriveSession.find_by_name('HT001_joelshin')
+  ds = DriveSession.find('HT001_joelshin')
   if ds
     puts "---> ht001_joelshin exists: #{@ds.inspect}"
+    ds.to_json
   else
     begin
       now = Time.now
