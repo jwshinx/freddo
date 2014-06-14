@@ -5,19 +5,23 @@ require 'haml'
 
 env_index = ARGV.index("-e")
 env_arg = ARGV[env_index + 1] if env_index
+puts "---> 1: #{env_index.inspect}"
+puts "---> 2: #{env_arg.inspect}"
+
 env = env_arg || ENV["SINATRA_ENV"] || "development"
 databases = YAML.load_file("config/database.yml")
 ActiveRecord::Base.establish_connection(databases[env])
+puts "---> 3: #{env.inspect}"
+puts "---> 4: #{ENV["SINATRA_ENV"].inspect}"  
+puts "---> 5: #{databases[env].inspect}"
+#settings.methods.each { |x| puts "---> settings m: #{x.inspect}" }
+
 
 $LOAD_PATH << File.expand_path('../models', __FILE__)
 require 'drive_session'
 
 if env == 'test'
-  puts "---> starting in test mode"
-  puts "---> 1: #{env_index.inspect}"
-  puts "---> 2: #{env_arg.inspect}"
-  puts "---> 3: #{env.inspect}"
-  puts "---> 4: #{ENV["SINATRA_ENV"].inspect}"
+  puts "---> starting in test mode. env is test"
 
   #Customer.destroy_all
   #puts "customers: all destroyed"
@@ -25,11 +29,7 @@ if env == 'test'
   #puts "initializing: barack"
   #puts "customer: #{Customer.all.inspect}"
 elsif env == 'development'
-  puts "---> starting in development mode"
-  puts "---> 1: #{env_index.inspect}"
-  puts "---> 2: #{env_arg.inspect}"
-  puts "---> 3: #{env.inspect}"
-  puts "---> 4: #{ENV["SINATRA_ENV"].inspect}"  
+  puts "---> starting in development mode. env is dev"
 end
 
 get '/' do
