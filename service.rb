@@ -32,8 +32,13 @@ elsif env == 'development'
   puts "---> starting in development mode. env is dev"
 end
 
+before do
+  @author = 'joel'
+  content_type :txt
+end
+
 get '/' do
-  'Hello Oakland!!!!'
+  "hello\n"
 end
 
 get '/drive_sessions/first' do
@@ -47,17 +52,52 @@ get '/drive_sessions/first' do
   #haml :first, :layout => :drive_session, :locals => { :ds => ds }
 end
 
+get '/drive_sessions/:name' do
+  #puts "---> in the service: #{params.inspect}"
+  ds = DriveSession.find_by_name(params['name'])
+  if ds
+    ds.to_json
+  else
+    error 404, { error: 'drive session nonexistent' }.to_json
+  end
+  #JSON.pretty_generate(
+  #haml :first, :layout => :drive_session, :locals => { :ds => ds }
+end
+
+put '/drive_sessions/:name' do
+  #puts "---> update 1: #{request.body.inspect}"
+  #puts "---> update 2: #{request.inspect}"
+  ds = DriveSession.find_by_name(params['name'])
+  if ds
+    begin
+      attributes = JSON.parse(request.body.read)
+      updated_ds = ds.update(attributes)
+      if updated_ds
+        ds.to_json
+      else
+        error 400, ds.errors.to_json
+      end
+    rescue => e
+      error 400, {:error => e.message}.to_json
+    end
+  else
+    error 404, {:error => 'drive session not found'}.to_json
+  end
+end
+
 get '/drive_sessions/new' do
   #puts "---> request: #{request.inspect}"
   #puts "---> body: #{request.body.inspect}"
   haml :new, :layout => :drive_session
 end
 
+post '/xpostx' do
+  name = params['name']
+end
+
 post '/drive_sessions' do
-  #ds = DriveSession.find_by_name('HT001_joelshin')
   ds = DriveSession.find('HT001_joelshin')
   if ds
-    puts "---> ht001_joelshin exists: #{@ds.inspect}"
     ds.to_json
   else
     begin
@@ -85,15 +125,49 @@ get '/drive_sessions' do
   end
 end
 
-=begin
-get '/customers/:id' do
-  cust = Customer.find_by_id params[:id]
-  if cust
-    cust.to_json
-  else
-    error 404, { error: 'customer not found' }.to_json
-  end
+#get '/*' do
+#  puts "---> sldfsdf #{params.inspect}"
+#  "you entered some rrrroute #{params['splat'].inspect}\n\n\n\n"
+#end
+
+get '/halt' do
+  "not visible\n\n\n"
+  halt 500  
 end
+
+get %r{/(sp|gr)eedy} do
+  text = "author: #{@author}\n#{request.path.inspect}\n"
+  request.env.each { |e| text << e.to_s + "\n"}
+  text << "\n\n\n"
+  request.methods.each { |e| text << e.to_s + "\n"}
+  text << "\n\n\n"
+  text
+end
+
+get '/myhtml' do
+  content_type :html
+  '<h3>my html</h3>'
+end
+
+get '/xcv' do
+  headers "X-Custom-Value" => 'oaklandddddddddddd'
+  "set custom-value\n\n\n"
+end
+
+get '/mxcv' do
+  headers "X-Custom-Value" => 'red', "X-Custom-Value-2" => 'blue'
+  "set multi-custom-value\n\n\n"
+end
+
+#not_found do
+#  "Joel says: 'That is shit. Not found.'\n\n\n"
+#end
+
+after do
+  ActiveRecord::Base.clear_active_connections!
+end
+
+=begin
 
 post '/customers' do
   begin
@@ -136,4 +210,16 @@ delete '/customers/:id' do
     error 404, { :error => 'customer not found' }.to_json
   end
 end
+
+__END__
+
+@@speedy
+<!DOCTYPE html>
+<html>
+<body>
+
+<span>speedy rendered</span>
+
+</body>
+</html>
 =end
