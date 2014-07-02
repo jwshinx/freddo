@@ -37,6 +37,14 @@ before do
   content_type :txt
 end
 
+configure do
+  set :show_exceptions, false
+end
+
+error do
+  "error. not good"
+end
+
 get '/' do
   "hello\n"
 end
@@ -157,6 +165,26 @@ end
 get '/mxcv' do
   headers "X-Custom-Value" => 'red', "X-Custom-Value-2" => 'blue'
   "set multi-custom-value\n\n\n"
+end
+
+get "/div_by_zero" do
+  content_type :txt
+  #'<h3>div by zero</h3>'
+  0/0
+  'divide by zero?'
+end
+
+# ====== caching =======================
+get '/caching1' do
+  content_type :txt
+  headers "Cache-Control" => "public, must-revalidate, max-age=60",
+    "Expires" => Time.at(Time.now.to_i + 60).to_s
+  "this page rendered at #{Time.now}"
+end
+get '/caching2' do
+  content_type :txt
+  expires 60, :public, :must_revalidate
+  "this page rendered at #{Time.now}"
 end
 
 #not_found do
