@@ -2,6 +2,7 @@ require 'sinatra'
 require 'active_record'
 require 'yaml'
 require 'haml'
+require './sinatra/post_get'
 
 env_index = ARGV.index("-e")
 env_arg = ARGV[env_index + 1] if env_index
@@ -39,6 +40,11 @@ end
 
 get '/' do
   "hello\n"
+end
+
+post_get '/postget' do
+  # post: curl -v --data "param1=value1&param2=value2" http://localhost:4567/postget
+  "hi #{@joel}, im postget\n#{params.inspect}\n\n"
 end
 
 get '/drive_sessions/first' do
