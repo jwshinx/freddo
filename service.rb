@@ -3,6 +3,7 @@ require 'active_record'
 require 'yaml'
 require 'haml'
 require './sinatra/post_get'
+require './sinatra/service_helper'
 
 env_index = ARGV.index("-e")
 env_arg = ARGV[env_index + 1] if env_index
@@ -33,6 +34,8 @@ elsif env == 'development'
   puts "---> starting in development mode. env is dev"
 end
 
+outer_self = self
+
 before do
   @author = 'joel'
   content_type :txt
@@ -47,7 +50,7 @@ error do
 end
 
 get '/' do
-  "hello\n"
+  "hello\n#{outer_self.class.inspect} #{outer_self.inspect}\n#{self.class} #{self}\n\n"
 end
 
 post_get '/postget' do
@@ -55,7 +58,13 @@ post_get '/postget' do
   "hi #{@joel}, im postget\n#{params.inspect}\n\n"
 end
 
+get '/helper' do
+  my_upcase('joel was here')
+  #'my helper'
+end
+
 get '/drive_sessions/first' do
+  content_type :html
   ds = DriveSession.first
   if ds
     ds.to_json
@@ -63,7 +72,7 @@ get '/drive_sessions/first' do
     error 404, { error: 'drive session nonexistent' }.to_json
   end
   #JSON.pretty_generate(
-  #haml :first, :layout => :drive_session, :locals => { :ds => ds }
+  haml :first, :layout => :drive_session, :locals => { :ds => ds }
 end
 
 get '/drive_sessions/:name' do
@@ -110,6 +119,9 @@ post '/xpostx' do
 end
 
 post '/drive_sessions' do
+
+  "simple post\n\n\n"
+=begin  
   ds = DriveSession.find('HT001_joelshin')
   if ds
     ds.to_json
@@ -128,6 +140,7 @@ post '/drive_sessions' do
       error 400, e.message.to_json
     end
   end
+=end
 end
 
 get '/drive_sessions' do
