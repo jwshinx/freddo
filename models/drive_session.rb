@@ -1,5 +1,7 @@
 class DriveSession < ActiveRecord::Base
   self.primary_key = 'name'
+  validates :name, presence: true
+  validates :name, uniqueness: { case_sensitive: false }
   #attr_accessible :name, :last_updated, :rig_id, :du_id, :server_version, :capture_count, 
   #                :start_time, :end_time, :current_event  
   

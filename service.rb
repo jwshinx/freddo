@@ -119,28 +119,16 @@ post '/xpostx' do
 end
 
 post '/drive_sessions' do
-
-  "simple post\n\n\n"
-=begin  
-  ds = DriveSession.find('HT001_joelshin')
-  if ds
-    ds.to_json
-  else
-    begin
-      now = Time.now
-      ds = DriveSession.create( name: 'HT001_joelshin', last_updated: now, rig_id: "HT001", du_id: '666', 
-        server_version: '1.1.1', capture_count: '444', start_time: now, end_time: now, 
-        current_event: 'STEPOFF' )
-      if ds.valid?
-        ds.to_json
-      else
-        error 400, ds.errors.to_json
-      end
-    rescue => e
-      error 400, e.message.to_json
-    end
+  begin
+    ds = DriveSession.create!(params)
+    if ds.valid?
+      ds.to_json
+    else
+      error 400, ds.errors.to_json
+    end    
+  rescue => e
+    error 400, e.message.to_json
   end
-=end
 end
 
 get '/drive_sessions' do
